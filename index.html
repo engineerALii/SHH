@@ -15,7 +15,7 @@
     
     <style>
         :root {
-            --accent: #d4af37;
+            --accent: #d4af37; /* Royal Gold */
             --bg-dark: #050505;
             --glass-border: rgba(255, 255, 255, 0.08);
         }
@@ -30,33 +30,38 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            perspective: 1200px; /* Increased perspective for better 3D feel on mobile */
+            perspective: 1200px;
+            touch-action: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         #aurora-canvas {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: 0;
-            filter: blur(40px) brightness(0.7);
-            opacity: 0.6;
+            filter: blur(50px) brightness(0.6); /* تنعيم أكثر للخلفية */
+            opacity: 0.5;
+            pointer-events: none;
         }
 
         .noise-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: 1;
-            opacity: 0.05;
+            opacity: 0.04;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
             pointer-events: none;
         }
 
-        /* Main Container - Adjusted transition for smooth gyro movement */
+        /* Luxury Card - Fixed Lighting */
         .luxury-card {
             position: relative;
             z-index: 10;
-            width: 85%; /* Slightly smaller for better mobile margins */
+            width: 85%;
             max-width: 400px;
-            background: rgba(15, 15, 15, 0.65);
+            background: rgba(15, 15, 15, 0.7); /* زيادة العتامة قليلاً */
             backdrop-filter: blur(40px);
             -webkit-backdrop-filter: blur(40px);
             border: 1px solid var(--glass-border);
@@ -66,32 +71,40 @@
                 0 0 0 1px rgba(0,0,0, 0.5),
                 0 30px 60px -10px rgba(0,0,0, 0.9),
                 inset 0 0 20px rgba(255,255,255, 0.03);
-            transform-style: preserve-3d;
-            /* Important: Smooth transition for orientation changes */
-            transition: transform 0.2s cubic-bezier(0.1, 0.5, 0.5, 1); 
-            will-change: transform;
+            overflow: hidden; /* تم الإصلاح: قص الإضاءة الزائدة */
         }
 
-        /* Depth layers for 3D effect */
         .card-content {
-            transform: translateZ(30px); /* Pushes content forward */
-            transform-style: preserve-3d;
+            position: relative;
+            z-index: 20;
         }
 
+        /* تأثير اللمعان (Sheen) المطور */
         .luxury-card::before {
             content: '';
             position: absolute;
-            inset: -1px;
-            z-index: -1;
-            background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.3), transparent);
-            border-radius: 30px;
-            animation: border-flow 4s linear infinite;
-            opacity: 0.6;
+            top: 0;
+            left: -100%; /* البداية من خارج اليسار */
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.03), 
+                rgba(212, 175, 55, 0.15), 
+                rgba(255, 255, 255, 0.03), 
+                transparent
+            );
+            transform: skewX(-20deg); /* إمالة الشعاع لواقعية أكثر */
+            animation: sheen-flow 6s infinite; /* حركة انسيابية */
+            pointer-events: none;
+            z-index: 1;
         }
 
-        @keyframes border-flow {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+        @keyframes sheen-flow {
+            0% { left: -100%; opacity: 0; }
+            50% { opacity: 1; }
+            100% { left: 200%; opacity: 0; }
         }
 
         .hero-year {
@@ -104,7 +117,6 @@
             -webkit-text-fill-color: transparent;
             margin-bottom: 1rem;
             filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
-            transform: translateZ(50px); /* 3D Depth */
         }
 
         .countdown-grid {
@@ -113,7 +125,6 @@
             gap: 10px;
             margin: 2rem 0;
             position: relative;
-            transform: translateZ(20px);
         }
 
         .time-val {
@@ -139,26 +150,25 @@
             font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             position: relative;
             overflow: hidden;
-            transform: translateZ(40px); /* Button floats */
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            touch-action: manipulation; 
+            z-index: 20; /* فوق طبقة اللمعان */
         }
 
-        .action-btn:active { transform: translateZ(35px) scale(0.98); }
+        .action-btn:active { transform: scale(0.98); }
 
-        /* Updated Shahad Reveal for Full Visibility */
         .shahad-container {
             padding: 20px 0;
             margin: 10px 0;
-            transform: translateZ(60px);
         }
 
         .shahad-reveal {
-            font-size: clamp(3.5rem, 13vw, 5.5rem); /* Dynamic sizing */
+            font-size: clamp(3.5rem, 13vw, 5.5rem);
             font-weight: 800;
-            line-height: 1.4; /* Adequate spacing */
+            line-height: 1.4;
             background: linear-gradient(45deg, #d4af37, #fef9e3, #d4af37);
             background-size: 200% auto;
             -webkit-background-clip: text;
@@ -201,7 +211,7 @@
             <span class="text-[9px] font-medium tracking-widest text-emerald-500/80">ONLINE</span>
         </div>
         
-        <button id="sound-btn" class="bg-black/30 backdrop-blur-md p-2 rounded-full border border-white/5 pointer-events-auto transition active:scale-90 hover:bg-white/10">
+        <button id="sound-btn" class="bg-black/30 backdrop-blur-md p-2 rounded-full border border-white/5 pointer-events-auto transition active:scale-90 hover:bg-white/10 touch-manipulation">
             <div id="visualizer" class="music-bars opacity-100">
                 <div class="music-bar" style="animation-delay: 0s"></div>
                 <div class="music-bar" style="animation-delay: 0.2s"></div>
@@ -226,19 +236,19 @@
                 </div>
 
                 <p class="text-[10px] text-gray-400 font-light mt-2 mb-8 leading-relaxed max-w-[90%]">
-                    حركي هاتفك لتري أبعاد الزمن...
+                    بداية عام مليء بالحب والأمل...
                 </p>
 
                 <button id="btn-enter" class="action-btn group">
                     <span class="relative z-10 flex items-center justify-center gap-2">
-                        دخول عالم شهد <i data-lucide="smartphone" class="w-4 h-4 animate-pulse"></i>
+                        دخول عالم شهد <i data-lucide="sparkles" class="w-4 h-4 animate-pulse"></i>
                     </span>
                 </button>
             </div>
 
             <!-- Celebration View -->
             <div id="view-celebration" class="hidden flex-col items-center text-center">
-                <div class="w-full flex justify-center mb-4 transform translate-z-20">
+                <div class="w-full flex justify-center mb-4">
                     <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-amber-300 to-yellow-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
                         <i data-lucide="crown" class="w-6 h-6 text-white"></i>
                     </div>
@@ -251,7 +261,7 @@
                     <span id="name-element" class="shahad-reveal relative z-10 block">شهد</span>
                 </div>
 
-                <p class="text-sm font-light text-gray-300 leading-7 mt-4 mb-8 px-2 border-l-2 border-amber-500/30 pl-4 text-right transform translate-z-10">
+                <p class="text-sm font-light text-gray-300 leading-7 mt-4 mb-8 px-2 border-l-2 border-amber-500/30 pl-4 text-right">
                     "في كل عام، أنتِ الاستثناء الجميل، والتفصيل الأغلى. دمتِ نوراً لا يغيب، وفرحاً يتجدد مع كل ثانية."
                 </p>
 
@@ -262,7 +272,7 @@
         </div>
     </main>
 
-    <footer class="fixed bottom-6 text-[8px] text-white/10 tracking-[0.5em] uppercase">
+    <footer class="fixed bottom-6 text-[8px] text-white/10 tracking-[0.5em] uppercase pointer-events-none">
         Designed for Shahad • 2026 Edition
     </footer>
 
@@ -274,57 +284,6 @@
         import { getFirestore, doc, setDoc, onSnapshot, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         lucide.createIcons();
-
-        // --- 1. DEVICE MOTION & PARALLAX LOGIC (The Core Request) ---
-        const card = document.getElementById('card-container');
-        
-        // Desktop Mouse Parallax
-        document.addEventListener('mousemove', (e) => {
-            const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
-            const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
-            card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-        });
-
-        // Mobile Gyroscope Parallax
-        function handleOrientation(event) {
-            // Beta is front-to-back tilt (-180 to 180)
-            // Gamma is left-to-right tilt (-90 to 90)
-            const x = event.gamma; 
-            const y = event.beta;
-
-            // Clamp rotation to avoid flipping
-            // Limit Gamma (Left/Right) to +/- 20deg card rotation
-            // Limit Beta (Front/Back) to +/- 20deg card rotation
-            
-            // Note: We use a simplified mapping assuming portrait mode
-            if (x !== null && y !== null) {
-                // Adjust sensitivity by dividing
-                let rotateY = x / 2.5; 
-                let rotateX = (y - 45) / 2.5; // Subtract 45 assuming user holds phone at 45deg angle
-
-                // Clamp values
-                rotateY = Math.max(-20, Math.min(20, rotateY));
-                rotateX = Math.max(-20, Math.min(20, rotateX));
-
-                card.style.transform = `rotateY(${rotateY}deg) rotateX(${-rotateX}deg)`;
-            }
-        }
-
-        function requestMotionPermission() {
-            // Check if Request Permission is supported (iOS 13+)
-            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-                DeviceMotionEvent.requestPermission()
-                    .then(response => {
-                        if (response === 'granted') {
-                            window.addEventListener('deviceorientation', handleOrientation);
-                        }
-                    })
-                    .catch(console.error);
-            } else {
-                // Non-iOS 13+ devices (Android usually allows this by default or different prompt)
-                window.addEventListener('deviceorientation', handleOrientation);
-            }
-        }
 
         // --- Background Animation ---
         const canvas = document.getElementById('aurora-canvas');
@@ -440,10 +399,9 @@
             catch(e) { await setDoc(docRef, { t: serverTimestamp(), by: user.uid }); }
         }
 
-        // View Transitions & Motion Trigger
+        // View Transitions
         document.getElementById('btn-enter').addEventListener('click', () => {
             playAudio();
-            requestMotionPermission(); // Request iOS motion permission here
             
             const v1 = document.getElementById('view-countdown');
             const v2 = document.getElementById('view-celebration');
