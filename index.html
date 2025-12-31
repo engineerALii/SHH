@@ -2,196 +2,322 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>2026 | شهد</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@100;300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@200;400;600;700&family=Zen+Tokyo+Zoo&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    
     <style>
         :root {
-            --ios-bg: #000000;
-            --ios-accent: #a78bfa;
-            --safe-top: env(safe-area-inset-top);
-            --safe-bottom: env(safe-area-inset-bottom);
+            --accent: #d4af37; /* Royal Gold */
+            --bg-dark: #050505;
+            --glass-border: rgba(255, 255, 255, 0.08);
         }
 
         body {
-            font-family: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--ios-bg);
-            color: #ffffff;
-            /* استخدام dvh لضمان التمركز الصحيح مع شريط العنوان في الجوال */
+            font-family: 'Readex Pro', sans-serif;
+            background-color: var(--bg-dark);
+            color: #fff;
             height: 100dvh;
             margin: 0;
             overflow: hidden;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            -webkit-tap-highlight-color: transparent;
+            perspective: 1000px; /* For 3D effects */
         }
 
-        /* تأثير الزجاج العميق لنظام iOS */
-        .ios-glass {
-            background: rgba(28, 28, 30, 0.6);
-            backdrop-filter: saturate(180%) blur(25px);
-            -webkit-backdrop-filter: saturate(180%) blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .ios-card {
-            border-radius: 42px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
-            width: 100%;
-            max-width: 380px;
-            margin: auto;
-        }
-
-        /* تأثير ألوان قوس قزح المتوهج */
-        @keyframes rainbow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .name-rainbow {
-            background: linear-gradient(270deg, #ff0080, #7928ca, #4299e1, #48bb78, #ecc94b, #ed8936, #ff0080);
-            background-size: 400% 400%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: rainbow 6s ease infinite;
-            filter: drop-shadow(0 0 10px rgba(167, 139, 250, 0.3));
-        }
-
-        .ios-btn {
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
-        }
-        .ios-btn:active {
-            transform: scale(0.94);
-            opacity: 0.8;
-        }
-
-        #star-canvas {
+        /* Background Canvas */
+        #aurora-canvas {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: 0;
-            background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
+            filter: blur(40px) brightness(0.7);
+            opacity: 0.6;
         }
 
-        .ui-container {
+        /* Noise Overlay for texture */
+        .noise-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        /* Main Container */
+        .luxury-card {
             position: relative;
             z-index: 10;
-            width: 100%;
-            height: 100%;
+            width: 90%;
+            max-width: 420px;
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 3rem 2rem;
+            box-shadow: 
+                0 0 0 1px rgba(0,0,0, 0.5),
+                0 20px 50px -10px rgba(0,0,0, 0.8),
+                inset 0 0 20px rgba(255,255,255, 0.02);
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+            overflow: hidden;
+        }
+
+        /* Glowing Border Animation */
+        .luxury-card::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            z-index: -1;
+            background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.3), transparent);
+            border-radius: 30px;
+            animation: border-flow 4s linear infinite;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .luxury-card:hover::before { opacity: 1; }
+
+        @keyframes border-flow {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Typography & Effects */
+        .gold-text {
+            background: linear-gradient(to bottom, #fff 20%, #d4af37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        .hero-year {
+            font-family: 'Zen Tokyo Zoo', cursive; /* Unique font for the year */
+            font-size: 6rem;
+            line-height: 0.8;
+            letter-spacing: 4px;
+            background: linear-gradient(180deg, #ffffff 0%, #888888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 0 15px rgba(255,255,255,0.2));
+        }
+
+        .countdown-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 2.5rem 0;
+            position: relative;
+        }
+
+        /* Elegant dividers */
+        .countdown-grid::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 20%;
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        }
+
+        .time-box {
             display: flex;
             flex-direction: column;
-            padding: var(--safe-top) 20px var(--safe-bottom) 20px;
+            align-items: center;
         }
 
-        /* محلل الصوت */
-        .bar {
-            width: 3px;
-            background: var(--ios-accent);
-            border-radius: 10px;
-            animation: visualize 1.2s ease-in-out infinite;
-        }
-        @keyframes visualize {
-            0%, 100% { height: 4px; }
-            50% { height: 14px; }
+        .time-val {
+            font-size: 2.2rem;
+            font-weight: 200;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -1px;
         }
 
-        /* أنيميشن الانتقال */
-        .fade-exit { opacity: 0; transform: scale(0.95); transition: all 0.5s ease-in; }
-        .fade-enter { opacity: 0; transform: translateY(20px); }
-        .fade-enter-active { opacity: 1; transform: translateY(0); transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .time-label {
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            color: #d4af37;
+            text-transform: uppercase;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
 
-        .hidden { display: none !important; }
+        /* Action Button */
+        .action-btn {
+            width: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 1.2rem;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s;
+        }
+
+        .action-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: #d4af37;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+        }
+        
+        .action-btn:hover::after { transform: translateX(100%); }
+
+        /* Shahad Name Reveal - Fixed Clipping */
+        .shahad-reveal {
+            font-size: clamp(3rem, 12vw, 5rem); /* Responsive font size */
+            font-weight: 800;
+            line-height: 1.5; /* Increased to fix vertical clipping */
+            margin: 1rem 0;
+            padding: 0 10px; /* Added padding to prevent side clipping */
+            background: linear-gradient(45deg, #d4af37, #fef9e3, #d4af37);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite;
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: inline-block; /* Ensure better rendering */
+        }
+
+        .shahad-reveal.visible {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        /* Utility */
+        .hidden { display: none; }
+        .fade-in { animation: fadeIn 1s forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Music Bars */
+        .music-bars { display: flex; gap: 2px; height: 12px; align-items: flex-end; }
+        .music-bar { width: 2px; background: #d4af37; animation: bounce 1s infinite; }
+        @keyframes bounce { 0%, 100% { height: 20%; } 50% { height: 100%; } }
+
     </style>
 </head>
 <body>
 
-    <canvas id="star-canvas"></canvas>
+    <!-- Dynamic Background -->
+    <canvas id="aurora-canvas"></canvas>
+    <div class="noise-overlay"></div>
 
-    <div class="ui-container">
+    <!-- Status Bar -->
+    <div class="fixed top-6 w-full px-6 flex justify-between items-center z-50 pointer-events-none">
+        <div class="flex items-center gap-2 bg-black/30 backdrop-blur-md px-3 py-1 rounded-full border border-white/5 pointer-events-auto">
+            <div id="connection-dot" class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+            <span class="text-[9px] font-medium tracking-widest text-emerald-500/80">ONLINE</span>
+        </div>
         
-        <!-- الهيدر (أعلى المركز) -->
-        <header class="flex flex-col items-center gap-4 mt-8">
-            <div class="flex items-center gap-2 ios-glass px-4 py-1.5 rounded-full">
-                <div id="status-dot" class="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
-                <span id="status-text" class="text-[9px] font-bold tracking-widest opacity-60 uppercase">Connecting</span>
+        <button id="sound-btn" class="bg-black/30 backdrop-blur-md p-2 rounded-full border border-white/5 pointer-events-auto transition active:scale-90 hover:bg-white/10">
+            <div id="visualizer" class="music-bars opacity-50">
+                <div class="music-bar" style="animation-delay: 0s"></div>
+                <div class="music-bar" style="animation-delay: 0.2s"></div>
+                <div class="music-bar" style="animation-delay: 0.4s"></div>
             </div>
-            
-            <div id="music-control" class="ios-glass p-3 rounded-2xl ios-btn cursor-pointer flex items-center gap-3">
-                <div id="visualizer" class="hidden items-end gap-0.5 h-4">
-                    <div class="bar" style="animation-delay: 0.1s"></div>
-                    <div class="bar" style="animation-delay: 0.3s"></div>
-                    <div class="bar" style="animation-delay: 0.2s"></div>
-                </div>
-                <span class="text-[10px] font-semibold text-purple-200">صوت الأمل</span>
-                <i data-lucide="music" class="w-3.5 h-3.5 text-purple-400"></i>
-            </div>
-        </header>
-
-        <!-- المحتوى المركزي (البطاقة) -->
-        <main class="flex-grow flex items-center justify-center w-full">
-            
-            <!-- بطاقة العداد -->
-            <div id="countdown-card" class="ios-glass ios-card p-10 flex flex-col items-center text-center">
-                <h1 class="text-7xl font-bold mb-1 tracking-tighter text-white">2026</h1>
-                <p class="text-purple-300/50 text-[9px] font-bold tracking-[0.4em] uppercase mb-10">Waiting for Magic</p>
-
-                <div class="grid grid-cols-4 gap-4 w-full mb-12">
-                    <div class="flex flex-col">
-                        <span id="days" class="text-3xl font-bold">00</span>
-                        <span class="text-[8px] font-bold opacity-30 uppercase mt-1">يوم</span>
-                    </div>
-                    <div class="flex flex-col">
-                        <span id="hours" class="text-3xl font-bold">00</span>
-                        <span class="text-[8px] font-bold opacity-30 uppercase mt-1">ساعة</span>
-                    </div>
-                    <div class="flex flex-col">
-                        <span id="minutes" class="text-3xl font-bold">00</span>
-                        <span class="text-[8px] font-bold opacity-30 uppercase mt-1">دقيقة</span>
-                    </div>
-                    <div class="flex flex-col">
-                        <span id="seconds" class="text-3xl font-bold">00</span>
-                        <span class="text-[8px] font-bold opacity-30 uppercase mt-1">ثانية</span>
-                    </div>
-                </div>
-
-                <button id="preview-btn" class="w-full bg-white text-black py-5 rounded-[2rem] font-bold text-xs ios-btn shadow-2xl">
-                    استكشاف عالم شهد ✨
-                </button>
-            </div>
-
-            <!-- بطاقة المعايدة -->
-            <div id="celebration-card" class="hidden ios-glass ios-card p-10 flex flex-col items-center text-center fade-enter">
-                <span class="text-purple-400 text-[9px] font-black tracking-[0.3em] uppercase mb-6">Celestial Greeting</span>
-                <h2 class="text-4xl font-bold mb-8 leading-tight text-white">
-                    كل عام وأنتِ <br>بخير يا <br>
-                    <span id="shahad-name" class="text-6xl block mt-4">شهد</span>
-                </h2>
-                
-                <p class="text-slate-300 font-light leading-relaxed mb-10 text-base italic px-2">
-                    "مع أول نبض في 2026، أردتُ أن أخبركِ أنكِ أجمل أقداري.. دمتِ لي حباً لا ينتهي."
-                </p>
-
-                <button id="global-celebrate-btn" class="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white py-5 rounded-[2rem] font-bold ios-btn shadow-[0_15px_40px_rgba(167,139,250,0.4)]">
-                    انقري للاحتفال ✨
-                </button>
-            </div>
-
-        </main>
-
-        <!-- الفوتر -->
-        <footer class="text-center py-6 opacity-20">
-            <p class="text-[7px] uppercase tracking-[0.7em]">iOS Ecosystem • Shahad 2026</p>
-        </footer>
-
+        </button>
     </div>
 
-    <!-- ملف الصوت -->
-    <audio id="bg-music" loop src="ali.mp3"></audio>
+    <!-- Main Card Container -->
+    <main id="card-container" class="luxury-card">
+        
+        <!-- Countdown View -->
+        <div id="view-countdown" class="flex flex-col items-center text-center fade-in">
+            <div class="hero-year">2026</div>
+            <p class="text-xs font-light tracking-[0.3em] text-gray-400 uppercase">The Beginning of Forever</p>
+
+            <div class="countdown-grid w-full">
+                <div class="time-box">
+                    <span id="d" class="time-val">00</span>
+                    <span class="time-label">يوم</span>
+                </div>
+                <div class="time-box">
+                    <span id="h" class="time-val">00</span>
+                    <span class="time-label">ساعة</span>
+                </div>
+                <div class="time-box">
+                    <span id="m" class="time-val">00</span>
+                    <span class="time-label">دقيقة</span>
+                </div>
+                <div class="time-box">
+                    <span id="s" class="time-val">00</span>
+                    <span class="time-label">ثانية</span>
+                </div>
+            </div>
+
+            <p class="text-[10px] text-gray-500 font-light mt-4 mb-8 leading-relaxed max-w-[80%]">
+                لحظات تفصلنا عن عام جديد، وعالم جديد بانتظارك.
+            </p>
+
+            <button id="btn-enter" class="action-btn group">
+                <span class="relative z-10 flex items-center justify-center gap-2">
+                    دخول عالم شهد <i data-lucide="sparkles" class="w-4 h-4"></i>
+                </span>
+            </button>
+        </div>
+
+        <!-- Celebration View -->
+        <div id="view-celebration" class="hidden flex-col items-center text-center">
+            <div class="w-full flex justify-center mb-4">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-amber-300 to-yellow-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                    <i data-lucide="crown" class="w-6 h-6 text-white"></i>
+                </div>
+            </div>
+            
+            <h2 class="text-lg font-light text-gray-300 tracking-wide mb-2">عام سعيد لأجمل</h2>
+            
+            <div class="relative w-full flex justify-center">
+                <!-- Glowing Aura behind name -->
+                <div class="absolute inset-0 bg-amber-500/20 blur-[40px] rounded-full transform scale-150"></div>
+                <span id="name-element" class="shahad-reveal relative z-10 block">شهد</span>
+            </div>
+
+            <p class="text-sm font-light text-gray-300 leading-7 mt-6 mb-8 px-2 border-l-2 border-amber-500/30 pl-4 text-right">
+                "في كل عام، أنتِ الاستثناء الجميل، والتفصيل الأغلى. دمتِ نوراً لا يغيب، وفرحاً يتجدد مع كل ثانية."
+            </p>
+
+            <button id="btn-celebrate" class="action-btn">
+                <span class="relative z-10">إطلاق الاحتفال الكبير ✨</span>
+            </button>
+        </div>
+
+    </main>
+
+    <footer class="fixed bottom-6 text-[8px] text-white/10 tracking-[0.5em] uppercase">
+        Designed for Shahad • 2026 Edition
+    </footer>
+
+    <audio id="bg-audio" src="ali.mp3" autoplay loop></audio>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -200,175 +326,200 @@
 
         lucide.createIcons();
 
-        // تهيئة Firebase
-        const firebaseConfig = JSON.parse(__firebase_config);
+        // --- Background Animation (Aurora) ---
+        const canvas = document.getElementById('aurora-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, t = 0;
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function drawAurora() {
+            ctx.clearRect(0, 0, width, height);
+            // Create a dynamic gradient mesh
+            const g = ctx.createLinearGradient(0, 0, width, height);
+            g.addColorStop(0, '#050505');
+            g.addColorStop(0.5, '#0a0a1a');
+            g.addColorStop(1, '#000000');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw glowing orbs
+            for(let i=0; i<3; i++) {
+                const x = width/2 + Math.sin(t*0.001 + i) * width * 0.4;
+                const y = height/2 + Math.cos(t*0.0015 + i) * height * 0.3;
+                const r = width * 0.4;
+                
+                const grad = ctx.createRadialGradient(x, y, 0, x, y, r);
+                grad.addColorStop(0, `hsla(${200 + i*40}, 60%, 20%, 0.15)`);
+                grad.addColorStop(1, 'transparent');
+                
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI*2);
+                ctx.fill();
+            }
+            t += 5;
+            requestAnimationFrame(drawAurora);
+        }
+        drawAurora();
+
+        // --- Tilt Effect (Parallax) ---
+        const card = document.getElementById('card-container');
+        document.addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+            card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        });
+
+        // --- Logic & Firebase ---
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyD6MRZ7d7J1333erYoBrUGqocJNdGNjB7w",
+            authDomain: "neew-aec2b.firebaseapp.com",
+            databaseURL: "https://neew-aec2b-default-rtdb.firebaseio.com",
+            projectId: "neew-aec2b",
+            storageBucket: "neew-aec2b.firebasestorage.app",
+            messagingSenderId: "70112873200",
+            appId: "1:70112873200:web:b8ef2b3863be6f1bf39035"
+        };
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'sh-ios-v3';
-        const celebrationDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'celebrations', 'global');
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'sh-lux-26';
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'celebrations', 'global');
 
-        // إدارة الصوت
-        const bgMusic = document.getElementById('bg-music');
+        // Audio
+        const audio = document.getElementById('bg-audio');
         const visualizer = document.getElementById('visualizer');
         
-        const playMusic = async () => {
+        const playAudio = async () => {
             try {
-                await bgMusic.play();
-                visualizer.classList.replace('hidden', 'flex');
-            } catch (err) {
-                console.log("Audio not found");
-                visualizer.classList.replace('flex', 'hidden');
-            }
+                await audio.play();
+                visualizer.style.opacity = '1';
+            } catch(e) { console.log('Audio wait'); }
         };
 
-        document.getElementById('music-control').addEventListener('click', () => {
-            if (bgMusic.paused) playMusic();
-            else {
-                bgMusic.pause();
-                visualizer.classList.replace('flex', 'hidden');
-            }
+        document.getElementById('sound-btn').addEventListener('click', () => {
+            if(audio.paused) playAudio();
+            else { audio.pause(); visualizer.style.opacity = '0.3'; }
         });
 
-        // المصادقة والمزامنة
+        // Auth
         let user = null;
-        let lastTriggerTime = 0;
+        let lastTime = 0;
 
         const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                document.getElementById('status-text').innerText = "OFFLINE";
-                document.getElementById('status-dot').style.backgroundColor = "#ef4444";
-            }
+                    try { await signInWithCustomToken(auth, __initial_auth_token); }
+                    catch(e) { await signInAnonymously(auth); }
+                } else await signInAnonymously(auth);
+            } catch(e) { console.error(e); }
         };
 
         onAuthStateChanged(auth, (u) => {
             user = u;
-            if (user) {
-                document.getElementById('status-text').innerText = "CONNECTED";
-                document.getElementById('status-dot').style.backgroundColor = "#22c55e";
-                startSyncListener();
-            }
+            if(u) listen();
         });
-
         initAuth();
 
-        function startSyncListener() {
-            if (!user) return;
-            onSnapshot(celebrationDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if (data.triggerTime) {
-                        const triggerMs = data.triggerTime.toMillis();
-                        if (triggerMs > lastTriggerTime) {
-                            lastTriggerTime = triggerMs;
-                            if (Date.now() - triggerMs < 5000) triggerVisualCelebration();
-                        }
+        function listen() {
+            if(!user) return;
+            onSnapshot(docRef, (snap) => {
+                if(snap.exists()) {
+                    const d = snap.data();
+                    if(d.t && d.t.toMillis() > lastTime) {
+                        lastTime = d.t.toMillis();
+                        if(Date.now() - lastTime < 8000) fireConfetti();
                     }
-                } else {
-                    setDoc(celebrationDocRef, { triggerTime: null }).catch(() => {});
-                }
+                } else setDoc(docRef, { t: null });
             });
         }
 
-        async function triggerGlobalCelebration() {
-            if (!user) return;
-            triggerVisualCelebration();
-            lastTriggerTime = Date.now();
-            playMusic();
-            try {
-                await updateDoc(celebrationDocRef, { triggerTime: serverTimestamp(), triggeredBy: user.uid });
-            } catch (e) {
-                await setDoc(celebrationDocRef, { triggerTime: serverTimestamp(), triggeredBy: user.uid });
-            }
+        async function trigger() {
+            if(!user) return;
+            fireConfetti();
+            lastTime = Date.now();
+            playAudio();
+            try { await updateDoc(docRef, { t: serverTimestamp(), by: user.uid }); }
+            catch(e) { await setDoc(docRef, { t: serverTimestamp(), by: user.uid }); }
         }
 
-        // العداد
-        const targetDate = new Date("January 1, 2026 00:00:00").getTime();
-        const timer = setInterval(() => {
-            const dist = targetDate - new Date().getTime();
+        // View Transitions
+        document.getElementById('btn-enter').addEventListener('click', () => {
+            playAudio();
+            const v1 = document.getElementById('view-countdown');
+            const v2 = document.getElementById('view-celebration');
+            
+            v1.style.opacity = '0';
+            setTimeout(() => {
+                v1.classList.add('hidden');
+                v2.classList.remove('hidden');
+                v2.classList.add('fade-in');
+                v2.style.display = 'flex'; // Ensure flex layout
+                
+                // Animate Name
+                setTimeout(() => {
+                    document.getElementById('name-element').classList.add('visible');
+                }, 300);
+            }, 500);
+        });
+
+        document.getElementById('btn-celebrate').addEventListener('click', trigger);
+
+        // Firework Logic (High Detail)
+        function fireConfetti() {
+            const end = Date.now() + 3000;
+            const colors = ['#d4af37', '#fef9e3', '#ffffff', '#b8860b'];
+
+            (function frame() {
+                confetti({
+                    particleCount: 4,
+                    angle: 60,
+                    spread: 80,
+                    origin: { x: 0, y: 0.7 },
+                    colors: colors,
+                    shapes: ['circle'],
+                    scalar: 0.8,
+                    drift: 0.5
+                });
+                confetti({
+                    particleCount: 4,
+                    angle: 120,
+                    spread: 80,
+                    origin: { x: 1, y: 0.7 },
+                    colors: colors,
+                    shapes: ['circle'],
+                    scalar: 0.8,
+                    drift: -0.5
+                });
+
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+
+        // Timer
+        const target = new Date("Jan 1, 2026 00:00:00").getTime();
+        setInterval(() => {
+            const now = new Date().getTime();
+            const dist = target - now;
+            
             const d = Math.floor(dist / (1000 * 60 * 60 * 24));
             const h = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
             const s = Math.floor((dist % (1000 * 60)) / 1000);
 
-            document.getElementById("days").innerText = d < 10 ? "0"+d : d;
-            document.getElementById("hours").innerText = h < 10 ? "0"+h : h;
-            document.getElementById("minutes").innerText = m < 10 ? "0"+m : m;
-            document.getElementById("seconds").innerText = s < 10 ? "0"+s : s;
-
-            if (dist < 0) {
-                clearInterval(timer);
-                transitionToCelebration();
-            }
+            document.getElementById('d').innerText = d < 10 ? '0'+d : d;
+            document.getElementById('h').innerText = h < 10 ? '0'+h : h;
+            document.getElementById('m').innerText = m < 10 ? '0'+m : m;
+            document.getElementById('s').innerText = s < 10 ? '0'+s : s;
         }, 1000);
 
-        function transitionToCelebration() {
-            const countdown = document.getElementById('countdown-card');
-            const celebration = document.getElementById('celebration-card');
-            if (countdown.classList.contains('hidden')) return;
-
-            countdown.classList.add('fade-exit');
-            setTimeout(() => {
-                countdown.classList.add('hidden');
-                celebration.classList.remove('hidden');
-                setTimeout(() => celebration.classList.add('fade-enter-active'), 50);
-            }, 500);
-        }
-
-        function triggerVisualCelebration() {
-            document.getElementById('shahad-name').classList.add('name-rainbow');
-            const duration = 3 * 1000;
-            const end = Date.now() + duration;
-
-            (function frame() {
-                confetti({ particleCount: 2, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#a78bfa', '#f472b6', '#ffffff'], scalar: 0.6 });
-                confetti({ particleCount: 2, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#a78bfa', '#f472b6', '#ffffff'], scalar: 0.6 });
-                if (Date.now() < end) requestAnimationFrame(frame);
-            }());
-        }
-
-        // خلفية النجوم
-        const canvas = document.getElementById('star-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-
-        function initStars() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            particles = Array.from({ length: 100 }, () => ({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                r: Math.random() * 1.5,
-                s: Math.random() * 0.2 + 0.1,
-                o: Math.random()
-            }));
-        }
-
-        function drawStars() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                ctx.fillStyle = `rgba(255, 255, 255, ${p.o})`;
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
-                p.y += p.s; if (p.y > canvas.height) p.y = -5;
-            });
-            requestAnimationFrame(drawStars);
-        }
-
-        document.getElementById('preview-btn').addEventListener('click', () => {
-            transitionToCelebration();
-            playMusic();
-        });
-        document.getElementById('global-celebrate-btn').addEventListener('click', triggerGlobalCelebration);
-
-        window.addEventListener('resize', initStars);
-        initStars();
-        drawStars();
     </script>
 </body>
 </html>
