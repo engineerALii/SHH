@@ -15,7 +15,7 @@
     
     <style>
         :root {
-            --accent: #d4af37; /* Royal Gold */
+            --accent: #d4af37;
             --bg-dark: #050505;
             --glass-border: rgba(255, 255, 255, 0.08);
         }
@@ -30,10 +30,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            perspective: 1000px; /* For 3D effects */
+            perspective: 1200px; /* Increased perspective for better 3D feel on mobile */
         }
 
-        /* Background Canvas */
         #aurora-canvas {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -42,7 +41,6 @@
             opacity: 0.6;
         }
 
-        /* Noise Overlay for texture */
         .noise-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -52,28 +50,34 @@
             pointer-events: none;
         }
 
-        /* Main Container */
+        /* Main Container - Adjusted transition for smooth gyro movement */
         .luxury-card {
             position: relative;
             z-index: 10;
-            width: 90%;
-            max-width: 420px;
-            background: rgba(10, 10, 10, 0.6);
+            width: 85%; /* Slightly smaller for better mobile margins */
+            max-width: 400px;
+            background: rgba(15, 15, 15, 0.65);
             backdrop-filter: blur(40px);
             -webkit-backdrop-filter: blur(40px);
             border: 1px solid var(--glass-border);
             border-radius: 30px;
-            padding: 3rem 2rem;
+            padding: 2.5rem 1.5rem;
             box-shadow: 
                 0 0 0 1px rgba(0,0,0, 0.5),
-                0 20px 50px -10px rgba(0,0,0, 0.8),
-                inset 0 0 20px rgba(255,255,255, 0.02);
+                0 30px 60px -10px rgba(0,0,0, 0.9),
+                inset 0 0 20px rgba(255,255,255, 0.03);
             transform-style: preserve-3d;
-            transition: transform 0.1s ease-out;
-            overflow: hidden;
+            /* Important: Smooth transition for orientation changes */
+            transition: transform 0.2s cubic-bezier(0.1, 0.5, 0.5, 1); 
+            will-change: transform;
         }
 
-        /* Glowing Border Animation */
+        /* Depth layers for 3D effect */
+        .card-content {
+            transform: translateZ(30px); /* Pushes content forward */
+            transform-style: preserve-3d;
+        }
+
         .luxury-card::before {
             content: '';
             position: absolute;
@@ -82,118 +86,79 @@
             background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.3), transparent);
             border-radius: 30px;
             animation: border-flow 4s linear infinite;
-            opacity: 0;
-            transition: opacity 0.5s;
+            opacity: 0.6;
         }
-        .luxury-card:hover::before { opacity: 1; }
 
         @keyframes border-flow {
             0% { transform: translateX(-100%); }
             100% { transform: translateX(100%); }
         }
 
-        /* Typography & Effects */
-        .gold-text {
-            background: linear-gradient(to bottom, #fff 20%, #d4af37 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        }
-
         .hero-year {
-            font-family: 'Zen Tokyo Zoo', cursive; /* Unique font for the year */
-            font-size: 6rem;
+            font-family: 'Zen Tokyo Zoo', cursive;
+            font-size: 5rem;
             line-height: 0.8;
             letter-spacing: 4px;
             background: linear-gradient(180deg, #ffffff 0%, #888888 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 1rem;
-            filter: drop-shadow(0 0 15px rgba(255,255,255,0.2));
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+            transform: translateZ(50px); /* 3D Depth */
         }
 
         .countdown-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin: 2.5rem 0;
+            gap: 10px;
+            margin: 2rem 0;
             position: relative;
-        }
-
-        /* Elegant dividers */
-        .countdown-grid::after {
-            content: '';
-            position: absolute;
-            bottom: -20px;
-            left: 20%;
-            width: 60%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-        }
-
-        .time-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            transform: translateZ(20px);
         }
 
         .time-val {
-            font-size: 2.2rem;
-            font-weight: 200;
+            font-size: 1.8rem;
+            font-weight: 300;
             font-variant-numeric: tabular-nums;
-            letter-spacing: -1px;
         }
 
         .time-label {
-            font-size: 0.65rem;
-            letter-spacing: 2px;
+            font-size: 0.6rem;
+            letter-spacing: 1px;
             color: #d4af37;
-            text-transform: uppercase;
             opacity: 0.8;
-            margin-top: 5px;
         }
 
-        /* Action Button */
         .action-btn {
             width: 100%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-            border: 1px solid rgba(255,255,255,0.1);
+            background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05));
+            border: 1px solid rgba(255,255,255,0.15);
             color: #fff;
             padding: 1.2rem;
-            border-radius: 16px;
+            border-radius: 18px;
             font-size: 0.9rem;
             font-weight: 600;
-            letter-spacing: 1px;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            transform: translateZ(40px); /* Button floats */
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
-        .action-btn::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transform: translateX(-100%);
-            transition: transform 0.5s;
+        .action-btn:active { transform: translateZ(35px) scale(0.98); }
+
+        /* Updated Shahad Reveal for Full Visibility */
+        .shahad-container {
+            padding: 20px 0;
+            margin: 10px 0;
+            transform: translateZ(60px);
         }
 
-        .action-btn:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: #d4af37;
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
-        }
-        
-        .action-btn:hover::after { transform: translateX(100%); }
-
-        /* Shahad Name Reveal - Fixed Clipping */
         .shahad-reveal {
-            font-size: clamp(3rem, 12vw, 5rem); /* Responsive font size */
+            font-size: clamp(3.5rem, 13vw, 5.5rem); /* Dynamic sizing */
             font-weight: 800;
-            line-height: 1.5; /* Increased to fix vertical clipping */
-            margin: 1rem 0;
-            padding: 0 10px; /* Added padding to prevent side clipping */
+            line-height: 1.4; /* Adequate spacing */
             background: linear-gradient(45deg, #d4af37, #fef9e3, #d4af37);
             background-size: 200% auto;
             -webkit-background-clip: text;
@@ -202,7 +167,8 @@
             transform: scale(0.9);
             opacity: 0;
             transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1);
-            display: inline-block; /* Ensure better rendering */
+            display: inline-block;
+            filter: drop-shadow(0 10px 25px rgba(212, 175, 55, 0.3));
         }
 
         .shahad-reveal.visible {
@@ -210,11 +176,8 @@
             opacity: 1;
         }
 
-        @keyframes shine {
-            to { background-position: 200% center; }
-        }
+        @keyframes shine { to { background-position: 200% center; } }
 
-        /* Utility */
         .hidden { display: none; }
         .fade-in { animation: fadeIn 1s forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -228,7 +191,6 @@
 </head>
 <body>
 
-    <!-- Dynamic Background -->
     <canvas id="aurora-canvas"></canvas>
     <div class="noise-overlay"></div>
 
@@ -240,7 +202,7 @@
         </div>
         
         <button id="sound-btn" class="bg-black/30 backdrop-blur-md p-2 rounded-full border border-white/5 pointer-events-auto transition active:scale-90 hover:bg-white/10">
-            <div id="visualizer" class="music-bars opacity-50">
+            <div id="visualizer" class="music-bars opacity-100">
                 <div class="music-bar" style="animation-delay: 0s"></div>
                 <div class="music-bar" style="animation-delay: 0.2s"></div>
                 <div class="music-bar" style="animation-delay: 0.4s"></div>
@@ -250,67 +212,54 @@
 
     <!-- Main Card Container -->
     <main id="card-container" class="luxury-card">
-        
-        <!-- Countdown View -->
-        <div id="view-countdown" class="flex flex-col items-center text-center fade-in">
-            <div class="hero-year">2026</div>
-            <p class="text-xs font-light tracking-[0.3em] text-gray-400 uppercase">The Beginning of Forever</p>
+        <div class="card-content">
+            <!-- Countdown View -->
+            <div id="view-countdown" class="flex flex-col items-center text-center fade-in">
+                <div class="hero-year">2026</div>
+                <p class="text-xs font-light tracking-[0.3em] text-gray-400 uppercase">The Beginning</p>
 
-            <div class="countdown-grid w-full">
-                <div class="time-box">
-                    <span id="d" class="time-val">00</span>
-                    <span class="time-label">يوم</span>
+                <div class="countdown-grid w-full">
+                    <div class="time-box"><span id="d" class="time-val">00</span><span class="time-label">يوم</span></div>
+                    <div class="time-box"><span id="h" class="time-val">00</span><span class="time-label">ساعة</span></div>
+                    <div class="time-box"><span id="m" class="time-val">00</span><span class="time-label">دقيقة</span></div>
+                    <div class="time-box"><span id="s" class="time-val">00</span><span class="time-label">ثانية</span></div>
                 </div>
-                <div class="time-box">
-                    <span id="h" class="time-val">00</span>
-                    <span class="time-label">ساعة</span>
-                </div>
-                <div class="time-box">
-                    <span id="m" class="time-val">00</span>
-                    <span class="time-label">دقيقة</span>
-                </div>
-                <div class="time-box">
-                    <span id="s" class="time-val">00</span>
-                    <span class="time-label">ثانية</span>
-                </div>
+
+                <p class="text-[10px] text-gray-400 font-light mt-2 mb-8 leading-relaxed max-w-[90%]">
+                    حركي هاتفك لتري أبعاد الزمن...
+                </p>
+
+                <button id="btn-enter" class="action-btn group">
+                    <span class="relative z-10 flex items-center justify-center gap-2">
+                        دخول عالم شهد <i data-lucide="smartphone" class="w-4 h-4 animate-pulse"></i>
+                    </span>
+                </button>
             </div>
 
-            <p class="text-[10px] text-gray-500 font-light mt-4 mb-8 leading-relaxed max-w-[80%]">
-                لحظات تفصلنا عن عام جديد، وعالم جديد بانتظارك.
-            </p>
+            <!-- Celebration View -->
+            <div id="view-celebration" class="hidden flex-col items-center text-center">
+                <div class="w-full flex justify-center mb-4 transform translate-z-20">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-amber-300 to-yellow-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                        <i data-lucide="crown" class="w-6 h-6 text-white"></i>
+                    </div>
+                </div>
+                
+                <h2 class="text-lg font-light text-gray-300 tracking-wide mb-2">عام سعيد لأجمل</h2>
+                
+                <div class="shahad-container">
+                    <div class="absolute inset-0 bg-amber-500/10 blur-[50px] rounded-full"></div>
+                    <span id="name-element" class="shahad-reveal relative z-10 block">شهد</span>
+                </div>
 
-            <button id="btn-enter" class="action-btn group">
-                <span class="relative z-10 flex items-center justify-center gap-2">
-                    دخول عالم شهد <i data-lucide="sparkles" class="w-4 h-4"></i>
-                </span>
-            </button>
+                <p class="text-sm font-light text-gray-300 leading-7 mt-4 mb-8 px-2 border-l-2 border-amber-500/30 pl-4 text-right transform translate-z-10">
+                    "في كل عام، أنتِ الاستثناء الجميل، والتفصيل الأغلى. دمتِ نوراً لا يغيب، وفرحاً يتجدد مع كل ثانية."
+                </p>
+
+                <button id="btn-celebrate" class="action-btn">
+                    <span class="relative z-10">إطلاق الاحتفال الكبير ✨</span>
+                </button>
+            </div>
         </div>
-
-        <!-- Celebration View -->
-        <div id="view-celebration" class="hidden flex-col items-center text-center">
-            <div class="w-full flex justify-center mb-4">
-                <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-amber-300 to-yellow-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
-                    <i data-lucide="crown" class="w-6 h-6 text-white"></i>
-                </div>
-            </div>
-            
-            <h2 class="text-lg font-light text-gray-300 tracking-wide mb-2">عام سعيد لأجمل</h2>
-            
-            <div class="relative w-full flex justify-center">
-                <!-- Glowing Aura behind name -->
-                <div class="absolute inset-0 bg-amber-500/20 blur-[40px] rounded-full transform scale-150"></div>
-                <span id="name-element" class="shahad-reveal relative z-10 block">شهد</span>
-            </div>
-
-            <p class="text-sm font-light text-gray-300 leading-7 mt-6 mb-8 px-2 border-l-2 border-amber-500/30 pl-4 text-right">
-                "في كل عام، أنتِ الاستثناء الجميل، والتفصيل الأغلى. دمتِ نوراً لا يغيب، وفرحاً يتجدد مع كل ثانية."
-            </p>
-
-            <button id="btn-celebrate" class="action-btn">
-                <span class="relative z-10">إطلاق الاحتفال الكبير ✨</span>
-            </button>
-        </div>
-
     </main>
 
     <footer class="fixed bottom-6 text-[8px] text-white/10 tracking-[0.5em] uppercase">
@@ -326,7 +275,58 @@
 
         lucide.createIcons();
 
-        // --- Background Animation (Aurora) ---
+        // --- 1. DEVICE MOTION & PARALLAX LOGIC (The Core Request) ---
+        const card = document.getElementById('card-container');
+        
+        // Desktop Mouse Parallax
+        document.addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+            card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        });
+
+        // Mobile Gyroscope Parallax
+        function handleOrientation(event) {
+            // Beta is front-to-back tilt (-180 to 180)
+            // Gamma is left-to-right tilt (-90 to 90)
+            const x = event.gamma; 
+            const y = event.beta;
+
+            // Clamp rotation to avoid flipping
+            // Limit Gamma (Left/Right) to +/- 20deg card rotation
+            // Limit Beta (Front/Back) to +/- 20deg card rotation
+            
+            // Note: We use a simplified mapping assuming portrait mode
+            if (x !== null && y !== null) {
+                // Adjust sensitivity by dividing
+                let rotateY = x / 2.5; 
+                let rotateX = (y - 45) / 2.5; // Subtract 45 assuming user holds phone at 45deg angle
+
+                // Clamp values
+                rotateY = Math.max(-20, Math.min(20, rotateY));
+                rotateX = Math.max(-20, Math.min(20, rotateX));
+
+                card.style.transform = `rotateY(${rotateY}deg) rotateX(${-rotateX}deg)`;
+            }
+        }
+
+        function requestMotionPermission() {
+            // Check if Request Permission is supported (iOS 13+)
+            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                DeviceMotionEvent.requestPermission()
+                    .then(response => {
+                        if (response === 'granted') {
+                            window.addEventListener('deviceorientation', handleOrientation);
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                // Non-iOS 13+ devices (Android usually allows this by default or different prompt)
+                window.addEventListener('deviceorientation', handleOrientation);
+            }
+        }
+
+        // --- Background Animation ---
         const canvas = document.getElementById('aurora-canvas');
         const ctx = canvas.getContext('2d');
         let width, height, t = 0;
@@ -340,7 +340,6 @@
 
         function drawAurora() {
             ctx.clearRect(0, 0, width, height);
-            // Create a dynamic gradient mesh
             const g = ctx.createLinearGradient(0, 0, width, height);
             g.addColorStop(0, '#050505');
             g.addColorStop(0.5, '#0a0a1a');
@@ -348,7 +347,6 @@
             ctx.fillStyle = g;
             ctx.fillRect(0, 0, width, height);
 
-            // Draw glowing orbs
             for(let i=0; i<3; i++) {
                 const x = width/2 + Math.sin(t*0.001 + i) * width * 0.4;
                 const y = height/2 + Math.cos(t*0.0015 + i) * height * 0.3;
@@ -367,14 +365,6 @@
             requestAnimationFrame(drawAurora);
         }
         drawAurora();
-
-        // --- Tilt Effect (Parallax) ---
-        const card = document.getElementById('card-container');
-        document.addEventListener('mousemove', (e) => {
-            const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
-            const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
-            card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-        });
 
         // --- Logic & Firebase ---
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
@@ -450,9 +440,11 @@
             catch(e) { await setDoc(docRef, { t: serverTimestamp(), by: user.uid }); }
         }
 
-        // View Transitions
+        // View Transitions & Motion Trigger
         document.getElementById('btn-enter').addEventListener('click', () => {
             playAudio();
+            requestMotionPermission(); // Request iOS motion permission here
+            
             const v1 = document.getElementById('view-countdown');
             const v2 = document.getElementById('view-celebration');
             
@@ -461,9 +453,8 @@
                 v1.classList.add('hidden');
                 v2.classList.remove('hidden');
                 v2.classList.add('fade-in');
-                v2.style.display = 'flex'; // Ensure flex layout
+                v2.style.display = 'flex';
                 
-                // Animate Name
                 setTimeout(() => {
                     document.getElementById('name-element').classList.add('visible');
                 }, 300);
@@ -472,7 +463,6 @@
 
         document.getElementById('btn-celebrate').addEventListener('click', trigger);
 
-        // Firework Logic (High Detail)
         function fireConfetti() {
             const end = Date.now() + 3000;
             const colors = ['#d4af37', '#fef9e3', '#ffffff', '#b8860b'];
@@ -503,7 +493,6 @@
             }());
         }
 
-        // Timer
         const target = new Date("Jan 1, 2026 00:00:00").getTime();
         setInterval(() => {
             const now = new Date().getTime();
