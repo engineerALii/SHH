@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>احتفالية 2026 | شهد</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --secondary: #ec4899;
+            --bg-deep: #020617;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-deep);
+            color: #f8fafc;
+            overflow-x: hidden;
+            margin: 0;
+            background: radial-gradient(circle at center, #1e1b4b 0%, #020617 100%);
+        }
+
+        .font-serif { font-family: 'Playfair Display', serif; }
+
+        /* Glassmorphism Stylized */
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        .neon-text {
+            text-shadow: 0 0 10px rgba(139, 92, 246, 0.5), 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .countdown-box {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        @media (min-width: 768px) {
+            .countdown-box:hover {
+                transform: translateY(-5px);
+                border-color: var(--primary);
+            }
+        }
+
+        .countdown-box::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, var(--primary), transparent 30%);
+            animation: rotate 4s linear infinite;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        #star-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .hidden-content { display: none; opacity: 0; }
+        .visible-content { display: block; animation: fadeIn 2s forwards; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Status Indicator */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #22c55e;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px #22c55e;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen items-center justify-center p-4 md:p-6">
+
+    <canvas id="star-canvas"></canvas>
+
+    <!-- UI Overlay -->
+    <div id="user-status" class="fixed top-4 right-4 md:top-6 md:right-6 glass px-3 py-1.5 md:px-4 md:py-2 rounded-full text-[9px] md:text-[10px] flex items-center gap-2 z-50">
+        <span class="status-dot"></span>
+        <span id="status-text">جاري الربط...</span>
+    </div>
+
+    <div id="main-content" class="w-full max-w-5xl z-10 text-center px-2">
+        
+        <!-- Welcome Section -->
+        <div id="countdown-section" class="transition-all duration-1000">
+            <h1 class="text-6xl md:text-8xl font-black mb-2 neon-text tracking-tighter">2026</h1>
+            <p class="text-purple-300 text-base md:text-2xl font-light mb-8 md:mb-12 tracking-widest">فجرٌ جديد، حكاياتٌ أجمل</p>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-8 mb-10 md:mb-16">
+                <div class="glass p-4 md:p-8 rounded-2xl md:rounded-3xl countdown-box">
+                    <div id="days" class="text-3xl md:text-6xl font-black text-white">00</div>
+                    <div class="text-[10px] md:text-xs text-purple-400 mt-1 md:mt-2 font-bold uppercase tracking-widest">يوم</div>
+                </div>
+                <div class="glass p-4 md:p-8 rounded-2xl md:rounded-3xl countdown-box">
+                    <div id="hours" class="text-3xl md:text-6xl font-black text-white">00</div>
+                    <div class="text-[10px] md:text-xs text-purple-400 mt-1 md:mt-2 font-bold uppercase tracking-widest">ساعة</div>
+                </div>
+                <div class="glass p-4 md:p-8 rounded-2xl md:rounded-3xl countdown-box">
+                    <div id="minutes" class="text-3xl md:text-6xl font-black text-white">00</div>
+                    <div class="text-[10px] md:text-xs text-purple-400 mt-1 md:mt-2 font-bold uppercase tracking-widest">دقيقة</div>
+                </div>
+                <div class="glass p-4 md:p-8 rounded-2xl md:rounded-3xl countdown-box">
+                    <div id="seconds" class="text-3xl md:text-6xl font-black text-white">00</div>
+                    <div class="text-[10px] md:text-xs text-purple-400 mt-1 md:mt-2 font-bold uppercase tracking-widest">ثانية</div>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center gap-4 md:gap-6">
+                <button id="preview-btn" class="glass px-6 py-2.5 md:px-8 md:py-3 rounded-full hover:bg-white/10 transition-all border-purple-500/30 text-purple-200 text-sm md:text-base">
+                    استكشاف عالم شهد ✨
+                </button>
+                <p class="text-slate-500 text-xs md:text-sm animate-pulse">في انتظار لحظة الصفر...</p>
+            </div>
+        </div>
+
+        <!-- Celebration Section -->
+        <div id="greeting-section" class="hidden-content w-full max-w-4xl mx-auto">
+            <div class="glass p-6 md:p-16 rounded-[2rem] md:rounded-[3rem] relative overflow-hidden group">
+                <!-- Background decoration -->
+                <div class="absolute top-0 right-0 w-32 h-32 md:w-64 md:h-64 bg-purple-600/10 rounded-full blur-[60px] md:blur-[100px]"></div>
+                <div class="absolute bottom-0 left-0 w-32 h-32 md:w-64 md:h-64 bg-pink-600/10 rounded-full blur-[60px] md:blur-[100px]"></div>
+
+                <div class="relative z-10">
+                    <span class="text-purple-400 font-bold tracking-[0.2em] md:tracking-[0.3em] uppercase text-[10px] md:text-sm">العام الجديد 2026</span>
+                    <h2 class="text-3xl md:text-7xl font-serif italic mt-4 md:mt-6 mb-6 md:mb-8 text-white leading-tight">
+                        كل عام وأنتِ <br class="hidden md:block">بخير يا <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500 font-black not-italic">شهد</span>
+                    </h2>
+                    
+                    <div class="animate-float text-5xl md:text-7xl mb-6 md:mb-10">✨</div>
+                    
+                    <p class="text-base md:text-2xl text-slate-300 font-light leading-relaxed mb-8 md:mb-12 max-w-xl mx-auto px-2">
+                        "مع اقتراب أولى ثواني 2026، أردتُ أن أهدي العيد لأجمل ما في عيدي.. دمتِ لي نبضاً، حباً، ووطناً لا يغيب."
+                    </p>
+
+                    <button id="global-celebrate-btn" class="relative group w-full sm:w-auto px-8 py-4 md:px-12 md:py-5 bg-white text-black font-black rounded-full shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 transition-all text-sm md:text-base">
+                        احتفلي معي ومع العالم ✨
+                        <div class="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    </button>
+                    
+                    <p class="text-[10px] md:text-xs text-slate-500 mt-4 md:mt-6 italic">عند الضغط، ستنطلق الألعاب النارية في شاشات الجميع</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="mt-auto py-6 md:py-10 text-slate-600 text-[8px] md:text-[10px] tracking-widest uppercase text-center">
+        Shahad & 2026 &bull; Eternal Connection
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD6MRZ7d7J1333erYoBrUGqocJNdGNjB7w",
+            authDomain: "neew-aec2b.firebaseapp.com",
+            databaseURL: "https://neew-aec2b-default-rtdb.firebaseio.com",
+            projectId: "neew-aec2b",
+            storageBucket: "neew-aec2b.firebasestorage.app",
+            messagingSenderId: "70112873200",
+            appId: "1:70112873200:web:b8ef2b3863be6f1bf39035"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'sh-2026-v2';
+
+        const celebrationDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'celebrations', 'global');
+
+        let currentUser = null;
+        let lastTriggerTime = 0;
+
+        async function initSync() {
+            try {
+                await signInAnonymously(auth);
+                onAuthStateChanged(auth, (user) => {
+                    currentUser = user;
+                    if (user) {
+                        document.getElementById('status-text').innerText = "متصل سحابياً";
+                        startSyncListener();
+                    }
+                });
+            } catch (error) {
+                document.getElementById('status-text').innerText = "وضع عدم الاتصال";
+            }
+        }
+
+        function startSyncListener() {
+            if (!currentUser) return;
+
+            onSnapshot(celebrationDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.triggerTime) {
+                        const triggerMs = data.triggerTime.toMillis();
+                        if (triggerMs > lastTriggerTime) {
+                            lastTriggerTime = triggerMs;
+                            if (Date.now() - triggerMs < 10000) {
+                                launchFireworks();
+                            }
+                        }
+                    }
+                } else {
+                    setDoc(celebrationDocRef, { triggerTime: null }).catch(() => {});
+                }
+            }, (error) => console.log("Sync limited"));
+        }
+
+        async function triggerGlobalCelebration() {
+            if (!currentUser) return;
+            try {
+                await updateDoc(celebrationDocRef, {
+                    triggerTime: serverTimestamp(),
+                    triggeredBy: currentUser.uid
+                });
+            } catch (e) {
+                await setDoc(celebrationDocRef, {
+                    triggerTime: serverTimestamp(),
+                    triggeredBy: currentUser.uid
+                });
+            }
+        }
+
+        // --- Logic ---
+        const targetDate = new Date("January 1, 2026 00:00:00").getTime();
+
+        const timer = setInterval(() => {
+            const now = new Date().getTime();
+            const dist = targetDate - now;
+
+            const d = Math.floor(dist / (1000 * 60 * 60 * 24));
+            const h = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((dist % (1000 * 60)) / 1000);
+
+            if(document.getElementById("days")) document.getElementById("days").innerText = d < 10 ? "0"+d : d;
+            if(document.getElementById("hours")) document.getElementById("hours").innerText = h < 10 ? "0"+h : h;
+            if(document.getElementById("minutes")) document.getElementById("minutes").innerText = m < 10 ? "0"+m : m;
+            if(document.getElementById("seconds")) document.getElementById("seconds").innerText = s < 10 ? "0"+s : s;
+
+            if (dist < 0) {
+                clearInterval(timer);
+                switchToCelebration();
+            }
+        }, 1000);
+
+        function switchToCelebration() {
+            const countdownSection = document.getElementById("countdown-section");
+            if(countdownSection) countdownSection.style.display = 'none';
+            
+            const greeting = document.getElementById("greeting-section");
+            greeting.classList.remove("hidden-content");
+            greeting.classList.add("visible-content");
+            
+            launchFireworks();
+        }
+
+        function launchFireworks() {
+            const duration = 4 * 1000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 3,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#8b5cf6', '#ec4899', '#ffffff']
+                });
+                confetti({
+                    particleCount: 3,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#8b5cf6', '#ec4899', '#ffffff']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        // --- Particles Background ---
+        const canvas = document.getElementById('star-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function initParticles() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particles = [];
+            for (let i = 0; i < 100; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 2,
+                    d: Math.random() * 100,
+                    s: Math.random() * 0.5
+                });
+            }
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            for (let i = 0; i < 100; i++) {
+                let p = particles[i];
+                ctx.moveTo(p.x, p.y);
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2, true);
+                p.y += p.s;
+                if (p.y > canvas.height) p.y = -10;
+            }
+            ctx.fill();
+            requestAnimationFrame(drawParticles);
+        }
+
+        window.addEventListener('resize', initParticles);
+        document.getElementById('preview-btn').addEventListener('click', switchToCelebration);
+        document.getElementById('global-celebrate-btn').addEventListener('click', triggerGlobalCelebration);
+
+        initParticles();
+        drawParticles();
+        initSync();
+    </script>
+</body>
+</html>
